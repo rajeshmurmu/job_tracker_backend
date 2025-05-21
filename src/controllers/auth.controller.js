@@ -123,6 +123,7 @@ export const loginUser = async (req, res) => {
     // save refresh token with current user
     user.refreshAccessToken = refreshToken;
     await user.save();
+    user.password = undefined;
 
     // send response
     const cookieOptions = {
@@ -141,6 +142,7 @@ export const loginUser = async (req, res) => {
         message: "User logged in successfully",
         refreshToken,
         accessToken,
+        user,
       });
   } catch (error) {
     // Handle validation errors
