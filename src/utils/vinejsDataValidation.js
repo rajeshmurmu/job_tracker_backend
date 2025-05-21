@@ -25,7 +25,7 @@ const jobSchema = vine.object({
   location: vine.string().minLength(3),
   status: vine.enum(["Applied", "Interview", "Rejected", "Offer", "Saved"]),
   applied_date: vine.date(),
-  salary: vine.string().optional(),
+  salary: vine.number().optional(),
   job_url: vine.string().optional(),
   notes: vine.string().optional(),
 });
