@@ -157,3 +157,91 @@ export const loginUser = async (req, res) => {
     });
   }
 };
+
+export const refreshAccessToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.cookies;
+
+    if (!refreshToken) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized Access",
+      });
+    }
+
+    const user = await User.findOne({ refreshAccessToken: refreshToken });
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized Access",
+      });
+    }
+
+    const accessToken = jwt.sign(
+      { email: user.email, id: user._id },
+      _conf.jwt_secret,
+      {
+        expiresIn: "1d",
+      }
+    );
+
+    const cookieOptions = {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      // maxAge: 24 * 60 * 60 * 1000, // 1 day
+    };
+
+    return res
+      .cookie("accessToken", accessToken, cookieOptions)
+      .status(200)
+      .json({
+        success: true,
+        message: "Access token refreshed successfully",
+      });
+  } catch (error) {
+    console.log("Error while refreshing access token", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error while refreshing access token",
+    });
+  }
+};
+
+export const logoutUser = async (req, res) => {
+  try {
+    const { refreshToken } = req.cookies;
+
+    if (!refreshToken) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized Access",
+      });
+    }
+
+    const user = await User.findOne({ refreshAccessToken: refreshToken });
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized Access",
+      });
+    }
+
+    user.refreshAccessToken = null;
+    await user.save();
+    res.clearCookie("refreshToken");
+    res.clearCookie("accessToken");
+    return res.status(200).json({
+      success: true,
+      message: "User logged out successfully",
+    });
+  } catch (error) {
+    console.log("Error while logging out user", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error while logging out user",
+    });
+  }
+};
