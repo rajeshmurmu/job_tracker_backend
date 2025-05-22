@@ -17,16 +17,17 @@ export const getAllJobs = async (req, res) => {
     }
 
     const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || ITEMS_PER_PAGE;
+    // const limit = Number(req.query.limit) || ITEMS_PER_PAGE; // default limit is 10
+    const limit = Number(req.query.limit);
     const skip = (page - 1) * ITEMS_PER_PAGE;
 
-    // validate query parameters
-    if (isNaN(page) || isNaN(limit) || page < 1 || limit < 1) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid query parameters",
-      });
-    }
+    // // validate query parameters
+    // if (isNaN(page) || isNaN(limit) || page < 1 || limit < 1) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: "Invalid query parameters",
+    //   });
+    // }
 
     // get all jobs for the requested user
     const jobs = await Job.find({ user: id }).skip(skip).limit(limit).sort({
