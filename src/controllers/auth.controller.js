@@ -130,7 +130,14 @@ export const loginUser = async (req, res) => {
       httpOnly: true,
       secure: true,
       sameSite: "none",
-      //   maxAge: 24 * 60 * 60 * 1000,
+      maxAge: 24 * 60 * 60 * 1000,
+    };
+
+    const refreshCookieOptions = {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     };
 
     return res
@@ -190,7 +197,7 @@ export const refreshAccessToken = async (req, res) => {
       httpOnly: true,
       secure: true,
       sameSite: "none",
-      // maxAge: 24 * 60 * 60 * 1000, // 1 day
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
     };
 
     return res
