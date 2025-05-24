@@ -10,7 +10,11 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:5173"],
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:5173",
+      _conf.client_url,
+    ],
     credentials: true,
   })
 );
@@ -19,6 +23,7 @@ app.use(
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import jobRoutes from "./routes/job.routes.js";
+import _conf from "./config/app.config.js";
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", userRoutes);
