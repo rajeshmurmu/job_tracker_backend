@@ -117,7 +117,13 @@ export const updateAvatar = async (req, res) => {
 
     // upload image to cloudinary
     const avatar_url = await uploadImageToCloudinary(req?.file?.path);
-    console.log(avatar_url);
+
+    if (!avatar_url) {
+      return res.status(400).json({
+        success: false,
+        message: "Error while uploading image",
+      });
+    }
 
     user.avatar = avatar_url;
     await user.save();

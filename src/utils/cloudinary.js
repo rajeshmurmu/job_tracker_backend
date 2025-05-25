@@ -16,13 +16,16 @@ export const uploadImageToCloudinary = async (file) => {
       use_filename: true,
     });
 
-    if (uploadResult) {
-      // console.log("uploadResult", uploadResult);
-      fs.unlinkSync(file); // remove from local
-    }
+    // if (uploadResult) {
+    //   // console.log("uploadResult", uploadResult);
+    //   fs.unlinkSync(file); // remove from local
+    // }
     return uploadResult.secure_url;
   } catch (error) {
     console.log("uploadImageToCloudinary error", error);
+    return null;
+  } finally {
+    fs.unlinkSync(file);
   }
 };
 

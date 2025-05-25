@@ -38,13 +38,7 @@ const userSchema = new mongoose.Schema(
     resetPasswordExpire: {
       type: Date,
     },
-    appliedJobs: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Job",
-      },
-    ],
-    savedJobs: [
+    applications: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Job",

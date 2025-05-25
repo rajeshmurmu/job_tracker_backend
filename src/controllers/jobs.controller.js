@@ -2,6 +2,7 @@ import vine, { errors } from "@vinejs/vine";
 import Job from "../models/job.model.js";
 import { jobSchema } from "../utils/vinejsDataValidation.js";
 import { format } from "date-fns";
+import User from "../models/user.model.js";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -99,6 +100,17 @@ export const createJob = async (req, res) => {
         message: "Unauthorized Access",
       });
     }
+
+    // get auth user
+    const user = await User.findOne({ _id: id });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
     const validDate = format(req.body.applied_date, "yyyy-MM-dd");
     // validate user inputformat(req.body.applied_date, "dd-MM-yyyy"),
     const validator = vine.compile(jobSchema);
@@ -143,6 +155,10 @@ export const createJob = async (req, res) => {
         message: "Error while creating job",
       });
     }
+
+    // add created job to users applications
+    user.applications.push(job);
+    await user.save();
 
     return res.status(201).json({
       success: true,
