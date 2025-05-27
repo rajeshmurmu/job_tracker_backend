@@ -76,7 +76,7 @@ Track your job applications, including the company, role, application status, an
 
 - User Model
 
-- Job Models
+- Application Models
 
 ### Routes:
 
