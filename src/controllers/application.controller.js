@@ -1,12 +1,12 @@
 import vine, { errors } from "@vinejs/vine";
-import Job from "../models/job.model.js";
-import { jobSchema } from "../utils/vinejsDataValidation.js";
+import Application from "../models/application.model.js";
+import { applicationSchema } from "../utils/vinejsDataValidation.js";
 import { format } from "date-fns";
 import User from "../models/user.model.js";
 
 const ITEMS_PER_PAGE = 10;
 
-export const getAllJobs = async (req, res) => {
+export const getAllApplications = async (req, res) => {
   try {
     const { id } = req?.user;
 
@@ -30,66 +30,69 @@ export const getAllJobs = async (req, res) => {
     //   });
     // }
 
-    // get all jobs for the requested user
-    const jobs = await Job.find({ user: id }).skip(skip).limit(limit).sort({
-      applied_date: -1,
-    });
+    // get all applications for the requested user
+    const applications = await Application.find({ user: id })
+      .skip(skip)
+      .limit(limit)
+      .sort({
+        applied_date: -1,
+      });
 
-    if (!jobs || jobs.length === 0) {
+    if (!applications || applications.length === 0) {
       return res.status(200).json({
         success: true,
-        jobs,
-        message: "No jobs found",
+        applications,
+        message: "No applications found",
       });
     }
 
-    // get total number of jobs and total number of pages
-    const totalJobs = await Job.countDocuments({ user: id });
-    const totalPage = Math.ceil(totalJobs / ITEMS_PER_PAGE);
+    // get total number of applications and total number of pages
+    const totalapplications = await Application.countDocuments({ user: id });
+    const totalPage = Math.ceil(totalapplications / ITEMS_PER_PAGE);
 
     return res.status(200).json({
       success: true,
-      jobs,
-      totalJobs,
+      applications,
+      totalapplications,
       totalPage,
       currentPage: page,
-      message: "Jobs fetched successfully",
+      message: "applications fetched successfully",
     });
   } catch (error) {
-    console.log("Error while getting all jobs", error);
+    console.log("Error while getting all applications", error);
     return res.status(500).json({
       success: false,
-      message: "Error while getting all jobs",
+      message: "Error while getting all applications",
     });
   }
 };
 
-export const getJob = async (req, res) => {
+export const getApplication = async (req, res) => {
   try {
-    const job = await Job.findOne({ _id: req.params?.id });
+    const application = await Application.findOne({ _id: req.params?.id });
 
-    if (!job) {
+    if (!application) {
       return res.status(404).json({
         success: false,
-        message: "Job not found",
+        message: "Application not found",
       });
     }
 
     return res.status(200).json({
       success: true,
-      message: "Job fetch successfully",
-      job,
+      message: "Application fetch successfully",
+      application,
     });
   } catch (error) {
-    console.log("Error while getting job", error);
+    console.log("Error while getting application", error);
     return res.status(500).json({
       success: false,
-      message: "Error getting job",
+      message: "Error getting application",
     });
   }
 };
 
-export const createJob = async (req, res) => {
+export const createApplication = async (req, res) => {
   try {
     // get auth user
     const { id } = req?.user;
@@ -113,14 +116,14 @@ export const createJob = async (req, res) => {
 
     const validDate = format(req.body.applied_date, "yyyy-MM-dd");
     // validate user inputformat(req.body.applied_date, "dd-MM-yyyy"),
-    const validator = vine.compile(jobSchema);
+    const validator = vine.compile(applicationSchema);
     const validatedData = await validator.validate({
       ...req.body,
       applied_date: validDate,
     });
 
-    // check if job already exists
-    const jobExists = await Job.findOne({
+    // check if application already exists
+    const applicationExists = await Application.findOne({
       company_name: validatedData.company_name,
       position: validatedData.position,
       location: validatedData.location,
@@ -128,57 +131,57 @@ export const createJob = async (req, res) => {
       applied_date: validatedData.applied_date,
     });
 
-    if (jobExists) {
+    if (applicationExists) {
       return res.status(400).json({
         success: false,
-        message: "Job already exists",
+        message: "Application already exists",
       });
     }
 
-    // check if job status is applied
+    // check if application status is applied
     // if (validatedData.status !== "applied") {
     //   return res.status(400).json({
     //     success: false,
-    //     message: "Job status must be applied",
+    //     message: "Application status must be applied",
     //   });
     // }
 
-    // add user id to job
+    // add user id to application
     validatedData.user = id;
 
-    // create new job
-    const job = await Job.create(validatedData);
+    // create new application
+    const application = await Application.create(validatedData);
 
-    if (!job) {
+    if (!application) {
       return res.status(400).json({
         success: false,
-        message: "Error while creating job",
+        message: "Error while creating application",
       });
     }
 
-    // add created job to users applications
-    user.applications.push(job);
+    // add created application to users applications
+    user.applications.push(application);
     await user.save();
 
     return res.status(201).json({
       success: true,
-      job,
-      message: "Job created successfully",
+      application,
+      message: "Application created successfully",
     });
   } catch (error) {
     // Handle validation errors
     if (error instanceof errors.E_VALIDATION_ERROR) {
       return res.status(400).json({ success: false, error: error.messages });
     }
-    console.log("Error while creating job", error);
+    console.log("Error while creating application", error);
     return res.status(500).json({
       success: false,
-      message: "Error while creating job",
+      message: "Error while creating application",
     });
   }
 };
 
-export const updateJob = async (req, res) => {
+export const updateApplication = async (req, res) => {
   try {
     // get auth user
     const { id } = req?.user;
@@ -191,40 +194,43 @@ export const updateJob = async (req, res) => {
     }
 
     // validate user input
-    const validator = vine.compile(jobSchema);
+    const validator = vine.compile(applicationSchema);
     const validatedData = await validator.validate(req.body);
 
-    // get already existing job
-    const jobExists = await Job.findOne({ _id: req.params.id, user: id });
+    // get already existing application
+    const applicationExists = await Application.findOne({
+      _id: req.params.id,
+      user: id,
+    });
 
-    if (!jobExists) {
+    if (!applicationExists) {
       return res.status(404).json({
         success: false,
-        message: "Job not found",
+        message: "Application not found",
       });
     }
 
-    // add user id to job
+    // add user id to application
     validatedData.user = id;
 
-    // update job
-    const job = await Job.findOneAndUpdate(
+    // update application
+    const application = await Application.findOneAndUpdate(
       { _id: req.params.id },
       validatedData,
       { new: true }
     );
 
-    if (!job) {
+    if (!application) {
       return res.status(400).json({
         success: false,
-        message: "Error while updating job",
+        message: "Error while updating application",
       });
     }
 
     return res.status(200).json({
       success: true,
-      job,
-      message: "Job updated successfully",
+      application,
+      message: "Application updated successfully",
     });
   } catch (error) {
     // Handle validation errors
@@ -232,42 +238,42 @@ export const updateJob = async (req, res) => {
       return res.status(400).json({ success: false, error: error.messages });
     }
 
-    console.log("Error while updating job", error);
+    console.log("Error while updating application", error);
     return res.status(500).json({
       success: false,
-      message: "Error while updating job",
+      message: "Error while updating application",
     });
   }
 };
 
-export const deleteJob = async (req, res) => {
+export const deleteApplication = async (req, res) => {
   try {
     // get auth user
     const { id } = req?.user;
 
-    // delete job
-    const deletedJob = await Job.findOneAndDelete({
+    // delete application
+    const deletedapplication = await Application.findOneAndDelete({
       _id: req.params.id,
-      user: req?.user?.id,
+      user: id,
     });
 
-    if (!deletedJob) {
+    if (!deletedapplication) {
       return res.status(400).json({
         success: false,
-        message: "Invalid request or job not found",
+        message: "Invalid request or application not found",
       });
     }
 
     return res.status(200).json({
       success: true,
-      job: deletedJob,
-      message: "Job deleted successfully",
+      application: deletedapplication,
+      message: "Application deleted successfully",
     });
   } catch (error) {
-    console.log("Error while deleting job", error);
+    console.log("Error while deleting application", error);
     return res.status(500).json({
       success: false,
-      message: "Error while deleting job",
+      message: "Error while deleting application",
     });
   }
 };

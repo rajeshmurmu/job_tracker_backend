@@ -23,11 +23,11 @@ app.use(
 // api routes
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
-import jobRoutes from "./routes/job.routes.js";
+import applicationRoutes from "./routes/application.routes.js";
 import _conf from "./config/app.config.js";
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", userRoutes);
-app.use("/api/v1/jobs", jobRoutes);
+app.use("/api/v1/applications", applicationRoutes);
 
 export default app;

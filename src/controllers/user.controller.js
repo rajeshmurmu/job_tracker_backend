@@ -78,6 +78,7 @@ export const updateUser = async (req, res) => {
 
     await user.save();
 
+    user.password = undefined;
     return res
       .clearCookie("accessToken")
       .clearCookie("refreshToken")
@@ -121,16 +122,56 @@ export const updateAvatar = async (req, res) => {
     if (!avatar_url) {
       return res.status(400).json({
         success: false,
-        message: "Error while uploading image",
+        message: "Error while uploading avatar",
       });
     }
 
     user.avatar = avatar_url;
     await user.save();
+    user.password = undefined;
     return res.status(200).json({
       success: true,
       message: "Avatar updated successfully",
-      avatar: user.avatar,
+      user,
+    });
+  } catch (error) {
+    console.log("Error while updating user", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error while updating user",
+    });
+  }
+};
+
+export const deleteAvatar = async (req, res) => {
+  try {
+    const { id } = req.user;
+    const user = await User.findOne({ _id: id });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // delete image from cloudinary
+    if (user.avatar) {
+      if (user.avatar.includes("cloudinary")) {
+        await deleteImageFromCloudinary(user.avatar);
+      }
+    }
+
+    user.avatar = `https://avatar.iran.liara.run/username?username=${user.name.replace(
+      " ",
+      "+"
+    )}`;
+    await user.save();
+    user.password = undefined;
+    return res.status(200).json({
+      success: true,
+      message: "Avatar deleted successfully",
+      user,
     });
   } catch (error) {
     console.log("Error while updating user", error);

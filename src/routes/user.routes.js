@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  deleteAvatar,
   getUser,
   updateAvatar,
   updateUser,
@@ -13,5 +14,6 @@ router.use(isAuthenticated);
 router.route("/me").get(getUser);
 router.route("/me").put(updateUser);
 router.route("/me/avatar").put(upload.single("avatar"), updateAvatar);
+router.route("/me/avatar").delete(deleteAvatar);
 
 export default router;

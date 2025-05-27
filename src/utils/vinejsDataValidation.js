@@ -19,8 +19,8 @@ const loginSchema = vine.object({
   password: vine.string().minLength(8),
 });
 
-const jobSchema = vine.object({
-  company_name: vine.string().minLength(3),
+const applicationSchema = vine.object({
+  company_name: vine.string().minLength(2),
   position: vine.string().minLength(3),
   location: vine.string().minLength(3),
   status: vine.enum(["Applied", "Interview", "Rejected", "Offer", "Saved"]),
@@ -30,4 +30,4 @@ const jobSchema = vine.object({
   notes: vine.string().optional(),
 });
 
-export { registerSchema, loginSchema, jobSchema };
+export { registerSchema, loginSchema, applicationSchema };
