@@ -98,17 +98,19 @@ Track your job applications, including the company, role, application status, an
 
 - PUT /api/v1/users/me/avatar (Update Avatar)
 
+- DELETE /api/v1/users/me/avatar (Remove Avatar)
+
 #### Jobs Routes
 
-- POST /api/jobs (Create job)
+- POST /api/v1/applications (Create job)
 
-- GET /api/jobs (List jobs)
+- GET /api/v1/applications (List jobs)
 
-- GET /api/jobs/:id (Get job)
+- GET /api/v1/applications/:id (Get job)
 
-- PUT /api/jobs/:id (Update job)
+- PUT /api/v1/applications/:id (Update job)
 
-- DELETE /api/jobs/:id (Delete job)
+- DELETE /api/v1/appplications/:id (Delete job)
 
 ## Steps To Clone And Run
 
