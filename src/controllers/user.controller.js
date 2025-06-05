@@ -67,12 +67,12 @@ export const updateUser = async (req, res) => {
     }
 
     // update name
-    if (user.name !== name) {
+    if (name && user.name !== name) {
       user.name = name;
     }
 
     // update email
-    if (user.email !== email) {
+    if (email && user.email !== email) {
       user.email = email;
     }
 
